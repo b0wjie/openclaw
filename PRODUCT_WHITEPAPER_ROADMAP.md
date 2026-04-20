@@ -1,259 +1,231 @@
-# OpenClaw Product Whitepaper & Roadmap (v0.1)
+# OpenClaw Hyper-Connectivity + Scale Roadmap (v0.2)
 
-## 1) Executive Summary
+## 1) Goal (What "connected to everything" means)
 
-OpenClaw currently has no functional application code, no build pipeline, no runtime modules, and no tests. This document provides a practical path from zero baseline to a fully functional, production-capable platform focused on:
+This roadmap focuses on the fastest path to make OpenClaw an integration-first platform that can connect and orchestrate:
 
-- **Core operational efficiency** (performance, reliability, maintainability).
-- **Advanced contactless connection** capabilities (NFC/BLE/QR provisioning and secure remote pairing).
-- **OpenClaw leadership/orchestration** (workflow control plane, policy-driven operations, and automation).
+- **GitHub repos** (source, issues, PRs, Actions, webhooks)
+- **VoltBots** (treated as external bot runtimes/services)
+- **AI agents** (tool-using or API-driven autonomous workers)
+- **AI Studio** environments (model/prompt workflows)
+- **Codex/Coding agents** (implementation and automation flows)
 
-The roadmap is split into phased releases with clear acceptance criteria, measurable metrics, and architecture guardrails.
-
----
-
-## 2) Baseline Observation
-
-### 2.1 Current State (Observed)
-- Repository contains only `.gitkeep` and Git metadata.
-- No application source tree.
-- No package manager manifests.
-- No build scripts or CI configuration.
-- No tests, debug profile, benchmarks, or deployment definitions.
-
-### 2.2 Baseline Assessment Score
-Given the current state, score is measured on a 0–100 scale:
-
-| Metric | Score | Notes |
-|---|---:|---|
-| Functional completeness | 0 | No features implemented |
-| Build readiness | 0 | No build tooling |
-| Test maturity | 0 | No automated tests |
-| Runtime performance | 0 | No runtime |
-| Security posture | 2 | Version control exists, but no security architecture |
-| Observability | 0 | No logs/metrics/traces |
-| Operability | 0 | No deployment/runtime topology |
-| Documentation quality | 5 | This whitepaper begins documentation |
-| **Composite score** | **0.9 / 100** | Weighted by production importance |
+The target is not just “many integrations,” but a **single control plane** that can route tasks across all providers with consistent auth, policy, observability, and scaling behavior.
 
 ---
 
-## 3) Foundational Cornerstones
+## 2) Fastest-path strategy (speed over perfection)
 
-To maximize long-term efficiency, implementation must start from these cornerstones:
+To get results quickly, use this execution order:
 
-1. **Architecture-first modularity**
-   - Core domain model, service boundaries, adapter interfaces.
-   - Hexagonal/clean architecture to isolate business logic from infrastructure.
+1. **Unify identity + auth first**
+   - OAuth/App credentials + secret vault.
+   - One connection layer reused by every integration.
 
-2. **Test-first quality gates**
-   - Unit, integration, contract, e2e, and performance test layers.
-   - Debug tests enabled locally and in CI with deterministic fixtures.
+2. **Build one “Integration Gateway” service**
+   - Standard adapter interface for all providers.
+   - Start with the 2 highest-impact adapters: GitHub + Codex.
 
-3. **Security-by-default**
-   - Identity, key management, encrypted transport, secure pairing.
-   - Threat modeling integrated into design reviews.
+3. **Event-first orchestration**
+   - Convert all external signals to normalized events.
+   - Drive workflows from event bus + queue (not direct point-to-point calls).
 
-4. **Observability-first operations**
-   - Structured logging, metrics, traces, SLO/SLI monitoring.
+4. **Ship a thin, useful MVP workflow**
+   - Example: “Issue opened in GitHub → AI agent triage → create PR draft via coding agent.”
 
-5. **Performance economics**
-   - Budget-based optimization (latency, CPU, memory, battery, cloud cost).
-
----
-
-## 4) Target Product Capabilities
-
-### 4.1 Capability A — Fully Contactless Connection
-A cross-channel connection framework that supports:
-- **NFC tap-to-pair** bootstrapping.
-- **BLE secure pairing** and fallback transport.
-- **QR-based provisioning** for camera-enabled setups.
-- **Remote contactless handoff** via temporary cryptographic connection tokens.
-
-#### Required subsystems
-- Connection broker (state machine + channel negotiation).
-- Cryptographic handshake service (ephemeral keys + rotating session secrets).
-- Device identity registry.
-- Policy engine (trust levels, expiration, revocation).
-
-### 4.2 Capability B — OpenClaw Leading (Orchestration Layer)
-A centralized "lead" module orchestrating all operations:
-- Task routing and command sequencing.
-- Priority queues and backpressure.
-- Policy-aware automation pipelines.
-- Failure recovery and retry orchestration.
-- Human override controls with audit trail.
-
-#### Required subsystems
-- Workflow engine.
-- Policy compiler.
-- Scheduling + queue manager.
-- Event bus + idempotency safeguards.
+5. **Scale by adding adapters, not rewriting core**
+   - Every new platform uses the same adapter contract, policy engine, and telemetry.
 
 ---
 
-## 5) Efficiency Optimization Strategy
+## 3) Target reference architecture
 
-Optimization should be implemented in this order to avoid premature micro-tuning:
+### Core platform services
+- **API Gateway**: inbound API + webhooks + auth checks.
+- **Integration Gateway**: adapter registry and provider clients.
+- **Orchestrator**: workflow/state machine runner.
+- **Event Bus + Queue**: decoupled async execution.
+- **Policy Engine**: permissions, data boundaries, execution guardrails.
+- **Secrets & Identity**: token management, key rotation, scoped credentials.
+- **Observability Stack**: logs, traces, metrics, SLO dashboards.
 
-1. **Algorithmic efficiency**
-   - O(N²) hotspots eliminated before infrastructure scaling.
+### Adapter contract (all integrations must implement)
+- `connect()` / `disconnect()`
+- `health_check()`
+- `list_capabilities()`
+- `execute_action(action, payload)`
+- `subscribe_events()`
+- `normalize_event(raw_event)`
 
-2. **I/O and network efficiency**
-   - Batch operations, connection pooling, protocol compression.
-
-3. **Concurrency model optimization**
-   - Async/non-blocking workers, bounded queues, lock minimization.
-
-4. **Caching strategy**
-   - Multi-layer cache with TTL and invalidation contracts.
-
-5. **Data model and storage tuning**
-   - Index strategy, write/read path segregation, cold/hot partitioning.
-
-6. **Cost-performance governance**
-   - Enforce resource budgets per module.
-
----
-
-## 6) Engineering Metrics Framework
-
-Use these metrics from first implementation onward:
-
-### Reliability
-- Availability (% uptime)
-- Error budget burn rate
-- MTTR / MTBF
-
-### Performance
-- P50/P95/P99 latency by critical operation
-- Throughput (ops/sec)
-- CPU, memory, and I/O utilization
-
-### Quality
-- Unit/integration/e2e coverage
-- Defect escape rate
-- Flaky test rate
-
-### Security
-- Critical/high vulnerability count
-- Mean time to remediate
-- Secret leakage incidents
-
-### Delivery
-- Lead time for change
-- Deployment frequency
-- Change failure rate
-
-### Product outcomes
-- Connection success rate (first attempt)
-- Contactless pairing completion time
-- Automation success ratio in orchestration workflows
+This contract is the key to scaling fast without architecture drift.
 
 ---
 
-## 7) Roadmap to First Fully Functional Release
+## 4) 0–90 day roadmap for fastest scaling results
 
-## Phase 0 (Week 0–1): Project Bootstrapping
-- Decide technology stack and monorepo structure.
-- Set coding standards, linting, formatter, pre-commit hooks.
-- Create CI pipeline with build+test gates.
-- Add local debug profile and seed fixtures.
+## Phase 0 (Days 0–7): Foundation sprint
 
-**Exit criteria**
-- `build`, `test`, `debug-test`, and `lint` commands operational.
+### Deliverables
+- Monorepo/service skeleton (`apps`, `services`, `adapters`, `docs`, `ops`).
+- CI/CD baseline with lint/test/build checks.
+- Secrets manager integration and environment profiles.
+- Event schema v1 + adapter interface definitions.
 
-## Phase 1 (Week 2–4): Core Skeleton
-- Implement domain entities and service interfaces.
-- Add persistence abstraction and event contracts.
-- Build API gateway skeleton and auth stub.
-- Add observability scaffolding.
-
-**Exit criteria**
-- Core service starts, health checks pass, basic integration tests run.
-
-## Phase 2 (Week 5–8): Contactless Connection MVP
-- Implement channel broker for NFC/BLE/QR.
-- Add secure handshake and token lifecycle.
-- Create pairing API and device registry.
-- Introduce failure fallback matrix and retries.
-
-**Exit criteria**
-- Contactless connection success rate >= 95% in controlled testing.
-
-## Phase 3 (Week 9–12): OpenClaw Leading (Orchestration) MVP
-- Add workflow engine + queue manager.
-- Implement policy-driven task routing.
-- Add execution audit trail and replay safety.
-- Add dashboard endpoints for operational visibility.
-
-**Exit criteria**
-- End-to-end automated workflow execution with rollback support.
-
-## Phase 4 (Week 13–16): Optimization & Hardening
-- Profile latency and memory bottlenecks.
-- Enforce SLOs and performance budgets.
-- Conduct security hardening and threat simulation.
-- Scale tests and chaos engineering scenarios.
-
-**Exit criteria**
-- P95 latency and availability targets met in staging.
-
-## Phase 5 (Week 17–20): Production Readiness
-- Deployment strategy (blue/green or canary).
-- Incident response runbooks.
-- Data backup/restore rehearsals.
-- Compliance and governance checks.
-
-**Exit criteria**
-- Production launch checklist signed off.
+### Success criteria
+- Local + CI pipeline green.
+- One sample workflow runs through orchestrator + queue.
 
 ---
 
-## 8) Initial Backlog (High Priority)
+## Phase 1 (Days 8–21): First revenue-impact integrations
 
-1. Create repository scaffolding (`src`, `tests`, `docs`, `ops`).
-2. Add build/test toolchain and debug test runner.
-3. Implement core domain + service contracts.
-4. Implement contactless connection broker.
-5. Implement orchestration lead module.
-6. Add observability + SLO dashboards.
-7. Add security baseline (authn/authz, key mgmt, encryption).
-8. Add perf benchmark suite and regression gates.
+### Priority adapters
+1. **GitHub**
+   - OAuth App or GitHub App auth.
+   - Webhooks: issues, PRs, pushes, workflow runs.
+   - Actions: create issue/PR/comment/label, read code metadata.
 
----
+2. **Codex/Coding agent provider**
+   - Task execution API adapter.
+   - Structured action result format (diff/test status/artifacts).
 
-## 9) Risk Register and Mitigations
+### Fast MVP workflows
+- “Issue triage + labeling + owner suggestion.”
+- “PR summary + risk score + release-note draft.”
+- “Bug ticket → generate patch proposal → open PR draft.”
 
-| Risk | Impact | Mitigation |
-|---|---|---|
-| Unclear product scope | Delays + rework | Product requirement freeze per phase |
-| Over-optimization too early | Wasted engineering effort | Benchmark-gated optimization policy |
-| Weak security in pairing | High security exposure | Threat model + cryptographic review |
-| Orchestration complexity | Reliability degradation | Incremental rollout + circuit breakers |
-| Test instability | Slower delivery | Deterministic fixtures + flaky test quarantine |
+### Success criteria
+- At least 3 end-to-end automations running in staging.
+- Median workflow latency under target budget (e.g., < 20s for async triage chain).
 
 ---
 
-## 10) Definition of “Fully Functional” (First Instance)
+## Phase 2 (Days 22–45): AI mesh expansion
 
-OpenClaw v1 is considered fully functional when all of the following are true:
+### Add adapters
+- **AI agents runtime** adapter (generic tool-calling agent endpoint).
+- **AI Studio** adapter (prompt/model job triggers + output retrieval).
+- **VoltBots** adapter (bot job dispatch + callback handling).
 
-1. Users can establish secure contactless sessions via at least two channels (e.g., BLE + QR).
-2. Orchestration lead module can execute policy-driven workflows end-to-end.
-3. CI passes full test pyramid and debug test suite.
-4. Observability dashboards track reliability/performance/security KPIs.
-5. Staging SLOs met for 14 consecutive days.
-6. Production deployment and rollback are automated and validated.
+### Platform upgrades
+- Policy templates per provider (what can each agent do in each repo/project).
+- Human-in-the-loop approval gates for high-risk actions.
+- Idempotency keys and retry/backoff framework.
+
+### Success criteria
+- Multi-provider workflow (GitHub + AI Studio + Codex or VoltBots) runs reliably.
+- Failure recovery covers timeout, duplicate event, provider outage.
 
 ---
 
-## 11) 90-Day Success Targets (Post-Launch)
+## Phase 3 (Days 46–70): Hardening for scale
 
-- >= 99.5% service availability.
-- >= 97% contactless first-attempt success rate.
-- <= 250ms P95 critical orchestration route latency.
-- <= 2% change failure rate.
-- >= 80% automated workflow completion success.
+### Scale controls
+- Horizontal autoscaling of orchestrator workers.
+- Rate-limit aware scheduler (provider quotas + fairness).
+- Dead-letter queue and replay console.
+- Tenant/project isolation boundaries.
 
+### Reliability controls
+- SLOs and error budget policies.
+- Circuit breakers per provider.
+- Synthetic integration checks every 5–15 minutes.
+
+### Success criteria
+- Sustained load test at target throughput without SLA breach.
+- Controlled chaos tests demonstrate graceful degradation.
+
+---
+
+## Phase 4 (Days 71–90): Production expansion
+
+### Go-live package
+- Runbooks (incident, rollback, token compromise).
+- Security review (least privilege, audit logs, secret rotation).
+- Cost guardrails (per-workflow and per-provider budget limits).
+
+### Growth motion
+- Adapter SDK for rapid partner integration.
+- Template library of reusable workflows.
+- Self-serve onboarding wizard for new repos/projects.
+
+### Success criteria
+- Production-ready with at least 5 high-value workflows used by real teams.
+
+---
+
+## 5) Prioritization matrix (what to build first)
+
+Score each integration by:
+- **Business impact** (0–5)
+- **Implementation effort** (0–5, lower is better)
+- **Operational risk** (0–5, lower is better)
+- **Data sensitivity complexity** (0–5, lower is better)
+
+Prioritize highest `(impact * 2) - effort - risk - sensitivity`.
+
+Default first order for most teams:
+1. GitHub
+2. Codex/Coding agent
+3. AI agents runtime
+4. AI Studio
+5. VoltBots
+
+---
+
+## 6) KPI dashboard (track weekly)
+
+### Product + ops KPIs
+- Time-to-onboard new integration (goal: < 2 days after adapter template exists)
+- Workflow success rate (goal: > 98% for mature workflows)
+- P95 orchestration latency
+- Human override rate (should fall over time)
+- Mean time to recover failed workflow
+- Cost per successful automation
+
+### Scale KPIs
+- Events/sec sustained
+- Queue lag (P95)
+- Provider API error ratio by adapter
+- Autoscaling reaction time
+
+---
+
+## 7) Key risks and mitigations
+
+1. **Provider API instability**
+   - Mitigation: adapter isolation + contract tests + circuit breakers.
+
+2. **Token/security incidents**
+   - Mitigation: short-lived credentials, scoped permissions, rotation automation.
+
+3. **Agent hallucination/high-risk actions**
+   - Mitigation: policy constraints + dry-run mode + approval gates.
+
+4. **Cost blow-ups from agent workflows**
+   - Mitigation: per-workflow budgets + throttling + model tiering rules.
+
+---
+
+## 8) Open questions to finalize before implementation
+
+To optimize this for your exact context, I need answers to these:
+
+1. **Primary outcome in next 30 days**: speed of delivery, cost reduction, code quality, or fully autonomous workflows?
+2. **Main stack**: Node/TypeScript, Python, Go, or mixed?
+3. **Deployment target**: AWS, Azure, GCP, on-prem, or hybrid?
+4. **Security constraints**: SOC2/HIPAA/GDPR/enterprise-only controls needed now?
+5. **Most important integration first**: GitHub, Codex, AI Studio, VoltBots, or another agent runtime?
+6. **Human approval model**: fully autonomous, approval for risky actions, or approval for all write actions?
+
+---
+
+## 9) Immediate next actions (this week)
+
+1. Lock adapter contract + event schema.
+2. Stand up GitHub adapter + webhook ingestion.
+3. Stand up one coding-agent adapter (Codex).
+4. Build one measurable workflow and deploy to staging.
+5. Publish KPI dashboard baseline.
+
+If these five are done in week one, scaling in weeks 2–4 becomes dramatically faster.
